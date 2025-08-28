@@ -11,7 +11,7 @@ const parseList = (text: string, header: string): string[] => {
     return match[1]
       .trim()
       .split('\n')
-      .map((item) => item.trim().replace(/^- \s*/, ''))
+      .map((item) => item.trim().replace(/^[-*]\s*/, ''))
       .filter(Boolean);
   }
   return [];
@@ -23,13 +23,35 @@ const parseValue = (text: string, field: string): string => {
   return match ? match[1].trim() : '';
 };
 
+const parseBio = (text: string): string => {
+    const bioHeaders = ['Bio', 'Background', 'Summary'];
+    for (const header of bioHeaders) {
+        const bio = parseValue(text, header);
+        if (bio) return bio;
+    }
+
+    // Fallback if no specific bio section is found
+    const firstSectionMatch = text.match(/^(.*?)(?:\n\*\*|\n\n)/);
+    if (firstSectionMatch) {
+        const potentialBio = firstSectionMatch[1].trim();
+        // Avoid using sections that are just key-value pairs
+        if (!/:\s/.test(potentialBio)) {
+            return potentialBio;
+        }
+    }
+    
+    // Final fallback to the first significant paragraph if any
+    const paragraphs = text.split('\n\n');
+    return paragraphs[0] || '';
+}
+
 const parsePersonaText = (text: string): Omit<Persona, 'id' | 'avatarUrl'> => {
   const name = parseValue(text, 'Name');
   const ageStr = parseValue(text, 'Age');
   const age = ageStr ? parseInt(ageStr.match(/\d+/)?.[0] || '30', 10) : 30;
   const profession = parseValue(text, 'Profession');
   
-  const bio = parseValue(text, 'Bio') || parseValue(text, 'Background') || text.split('\n\n')[0];
+  const bio = parseBio(text);
 
   return {
     name: name || 'Unnamed Persona',
