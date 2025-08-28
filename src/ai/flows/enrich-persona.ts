@@ -51,6 +51,8 @@ const enrichPersonaFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await enrichPersonaPrompt(input);
-    return output!;
+    // If the model returns a null or empty output, fall back to the existing persona text
+    // to avoid a crash and ensure the data remains consistent.
+    return output || input.existingPersona;
   }
 );
