@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { SidebarProvider, Sidebar, SidebarInset, SidebarContent, SidebarHeader } from '@/components/ui/sidebar';
+import { useState, useMemo } from 'react';
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader } from '@/components/ui/sidebar';
 import Header from '@/components/header';
 import PersonaGenerationPanel from '@/components/persona-generation-panel';
 import { PersonaCard } from '@/components/persona-card';
 import { PersonaCardSkeleton } from '@/components/persona-card-skeleton';
 import EmptyState from '@/components/empty-state';
 import type { Persona } from '@/lib/types';
+import type { GeneratePersonaInput } from '@/ai/flows/generate-persona';
 import { generatePersonaAction, updatePersonaAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,10 +18,10 @@ export default function Home() {
   const [filters, setFilters] = useState({ searchTerm: '', ageRange: [0, 100] });
   const { toast } = useToast();
 
-  const handleGeneratePersona = async (prompt: string) => {
+  const handleGeneratePersona = async (input: GeneratePersonaInput) => {
     setIsLoading(true);
     try {
-      const newPersona = await generatePersonaAction(prompt);
+      const newPersona = await generatePersonaAction(input);
       setPersonas((prev) => [newPersona, ...prev]);
       toast({
         title: 'Persona Generated!',

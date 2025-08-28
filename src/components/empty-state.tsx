@@ -2,16 +2,18 @@
 
 import { Button } from '@/components/ui/button';
 import { PenSquare } from 'lucide-react';
+import type { GeneratePersonaInput } from '@/ai/flows/generate-persona';
+
 
 interface EmptyStateProps {
-  onGenerate: (prompt: string) => void;
+  onGenerate: (input: GeneratePersonaInput) => void;
 }
 
 const examplePrompts = [
-  "A tech-savvy university student in London",
-  "A retired librarian who loves gardening",
-  "A busy single parent juggling work and family",
-  "An aspiring musician living in Nashville",
+  { name: 'Alex', age: '28', prompt: "A tech-savvy university student in London" },
+  { name: 'Eleanor', age: '72', prompt: "A retired librarian who loves gardening" },
+  { name: 'David', age: '41', prompt: "A busy single parent juggling work and family" },
+  { name: 'Chloe', age: '24', prompt: "An aspiring musician living in Nashville" },
 ]
 
 export default function EmptyState({ onGenerate }: EmptyStateProps) {
@@ -34,7 +36,7 @@ export default function EmptyState({ onGenerate }: EmptyStateProps) {
         </Button>
       </div>
        <p className="mt-4 text-sm text-muted-foreground">
-        or try an example like "{examplePrompts[0]}"
+        or try an example like "{examplePrompts[0].prompt}"
       </p>
     </div>
   );

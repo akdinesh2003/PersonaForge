@@ -18,15 +18,18 @@ import { Separator } from './ui/separator';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Slider } from './ui/slider';
+import type { GeneratePersonaInput } from '@/ai/flows/generate-persona';
 
 const formSchema = z.object({
+  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+  age: z.string().regex(/^\d+$/, { message: 'Age must be a number.' }),
   prompt: z.string().min(10, {
-    message: 'Prompt must be at least 10 characters long.',
+    message: 'Description must be at least 10 characters long.',
   }),
 });
 
 interface PersonaGenerationPanelProps {
-  onGenerate: (prompt: string) => void;
+  onGenerate: (input: GeneratePersonaInput) => void;
   isLoading: boolean;
   filters: { searchTerm: string; ageRange: number[] };
   onFiltersChange: (filters: { searchTerm: string; ageRange: number[] }) => void;
@@ -41,12 +44,14 @@ export default function PersonaGenerationPanel({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
+      age: '',
       prompt: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    onGenerate(values.prompt);
+    onGenerate(values);
     form.reset();
   }
 
@@ -67,15 +72,43 @@ export default function PersonaGenerationPanel({
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Jane Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="age"
+              render={({ field }) => (
+                <FormItem className="w-20">
+                  <FormLabel>Age</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., 34" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="prompt"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prompt</FormLabel>
+                <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="e.g., A busy marketing manager in her 30s who loves yoga and technology..."
+                    placeholder="e.g., A busy marketing manager who loves yoga..."
                     className="resize-none"
                     {...field}
                   />

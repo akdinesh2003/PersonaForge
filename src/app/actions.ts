@@ -3,6 +3,7 @@
 import { generatePersona } from '@/ai/flows/generate-persona';
 import { enrichPersona } from '@/ai/flows/enrich-persona';
 import type { Persona } from '@/lib/types';
+import type { GeneratePersonaInput } from '@/ai/flows/generate-persona';
 
 const parseList = (text: string, header: string): string[] => {
   const regex = new RegExp(`(?:\\*\\*${header}\\*\\*|${header}:)([\\s\\S]*?)(?:\\n\\*\\*|\\n\\n|$)`, 'i');
@@ -45,17 +46,11 @@ const parseBio = (text: string): string => {
     return paragraphs[0] || '';
 }
 
-const parsePersonaText = (text: string): Omit<Persona, 'id' | 'avatarUrl'> => {
-  const name = parseValue(text, 'Name');
-  const ageStr = parseValue(text, 'Age');
-  const age = ageStr ? parseInt(ageStr.match(/\d+/)?.[0] || '30', 10) : 30;
+const parsePersonaText = (text: string): Omit<Persona, 'id' | 'avatarUrl' | 'name' | 'age'> => {
   const profession = parseValue(text, 'Profession');
-  
   const bio = parseBio(text);
 
   return {
-    name: name || 'Unnamed Persona',
-    age,
     profession: profession || 'Unspecified',
     bio: bio,
     demographics: parseList(text, 'Demographics'),
@@ -68,8 +63,8 @@ const parsePersonaText = (text: string): Omit<Persona, 'id' | 'avatarUrl'> => {
   };
 };
 
-export async function generatePersonaAction(prompt: string): Promise<Persona> {
-  const { personaDetails } = await generatePersona({ prompt });
+export async function generatePersonaAction(input: GeneratePersonaInput): Promise<Persona> {
+  const { personaDetails } = await generatePersona(input);
   if (!personaDetails) {
     throw new Error('AI failed to generate persona details.');
   }
@@ -77,6 +72,8 @@ export async function generatePersonaAction(prompt: string): Promise<Persona> {
   
   return {
     id: crypto.randomUUID(),
+    name: input.name,
+    age: parseInt(input.age, 10),
     ...parsedData,
     avatarUrl: `https://picsum.photos/seed/${crypto.randomUUID()}/400`,
   };

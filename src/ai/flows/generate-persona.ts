@@ -12,6 +12,8 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GeneratePersonaInputSchema = z.object({
+  name: z.string().describe('The name of the persona.'),
+  age: z.string().describe('The age of the persona.'),
   prompt: z.string().describe('A prompt describing the desired persona.'),
 });
 export type GeneratePersonaInput = z.infer<typeof GeneratePersonaInputSchema>;
@@ -29,7 +31,13 @@ const prompt = ai.definePrompt({
   name: 'generatePersonaPrompt',
   input: {schema: GeneratePersonaInputSchema},
   output: {schema: GeneratePersonaOutputSchema},
-  prompt: `You are a persona generation expert. Please generate a detailed user persona based on the following prompt: {{{prompt}}}. Include details such as demographics, motivations, pain points, and goals.`,
+  prompt: `You are a persona generation expert. Please generate a detailed user persona based on the following information.
+
+Name: {{{name}}}
+Age: {{{age}}}
+Description: {{{prompt}}}
+
+Include details such as a bio, demographics, motivations, pain points, and goals. Ensure you use the provided Name and Age in your response.`,
 });
 
 const generatePersonaFlow = ai.defineFlow(

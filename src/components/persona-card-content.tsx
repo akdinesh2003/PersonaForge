@@ -43,7 +43,7 @@ export function PersonaCardContent({ persona }: PersonaCardContentProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-foreground/80 mb-4 break-words">{persona.bio}</p>
+        <p className="text-foreground/80 mb-4 break-words whitespace-pre-wrap">{persona.bio}</p>
 
         <Accordion type="multiple" className="w-full">
             <DetailSection title="Personality" items={persona.personalityTraits} />
